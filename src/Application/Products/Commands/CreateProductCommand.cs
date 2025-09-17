@@ -1,4 +1,4 @@
-using Application.Common.Interfaces;
+using Application.Common.Interfaces.Repositories;
 using Domain.Products;
 using MediatR;
 
@@ -9,16 +9,16 @@ public record CreateProductCommand : IRequest<Product>
     public required string Title { get; init; }
     public required string Description { get; init; }
 }
-// validation (command -> validate -> handler)
+
 public class CreateProductCommandHandler(
-    IProductService productService) : IRequestHandler<CreateProductCommand, Product>
+    IProductRepository productRepository) : IRequestHandler<CreateProductCommand, Product>
 {
-    public Task<Product> Handle(CreateProductCommand request, CancellationToken cancellationToken)
+    public async Task<Product> Handle(CreateProductCommand request, CancellationToken cancellationToken)
     {
-        // check if product already exists
+        var product = await productRepository.AddAsync(
+            Product.New(Guid.NewGuid(), request.Title, request.Description),
+            cancellationToken);
 
-        var result = productService.CreateProduct(Guid.NewGuid(), request.Title, request.Description);
-
-        return Task.FromResult(result);
+        return product;
     }
 }

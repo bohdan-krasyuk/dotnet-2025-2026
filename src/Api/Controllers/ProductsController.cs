@@ -1,5 +1,6 @@
 using Api.Dtos;
 using Application.Common.Interfaces;
+using Application.Common.Interfaces.Queries;
 using Application.Products.Commands;
 using FluentValidation;
 using MediatR;
@@ -10,14 +11,14 @@ namespace Api.Controllers;
 [Route("products")]
 [ApiController]
 public class ProductsController(
-    IProductService productService,
+    IProductQueries productQueries,
     IValidator<CreateProductDto> createProductDtoValidator,
     ISender sender) : ControllerBase
 {
     [HttpGet]
-    public ActionResult<IReadOnlyList<ProductDto>> GetProducts(CancellationToken cancellationToken)
+    public async Task<ActionResult<IReadOnlyList<ProductDto>>> GetProducts(CancellationToken cancellationToken)
     {
-        var products = productService.GetProducts();
+        var products = await productQueries.GetAllAsync(cancellationToken);
 
         return products.Select(ProductDto.FromDomainModel).ToList();
     }

@@ -1,7 +1,5 @@
 using System.Reflection;
 using Application.Common.Behaviours;
-using Application.Common.Interfaces;
-using Application.Products.Services;
 using FluentValidation;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
@@ -13,7 +11,6 @@ public static class ConfigureServices
     public static void AddApplicationServices(this IServiceCollection services)
     {
         services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
-        services.AddSingleton<IProductService, ProductService>();
         services.AddMediatR(configuration => configuration.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
         services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehaviour<,>));
     }
