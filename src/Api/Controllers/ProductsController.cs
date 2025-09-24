@@ -12,7 +12,6 @@ namespace Api.Controllers;
 [ApiController]
 public class ProductsController(
     IProductQueries productQueries,
-    IValidator<CreateProductDto> createProductDtoValidator,
     ISender sender) : ControllerBase
 {
     [HttpGet]
@@ -28,13 +27,6 @@ public class ProductsController(
         [FromBody] CreateProductDto request,
         CancellationToken cancellationToken)
     {
-        var validationResult = createProductDtoValidator.Validate(request);
-
-        if (!validationResult.IsValid)
-        {
-            return BadRequest(validationResult.Errors);
-        }
-
         var input = new CreateProductCommand
         {
             Title = request.Title,
