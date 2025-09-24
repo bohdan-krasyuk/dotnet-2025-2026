@@ -3,6 +3,7 @@ using Application.Common.Interfaces.Repositories;
 using Infrastructure.Persistence.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Npgsql;
 
@@ -10,11 +11,9 @@ namespace Infrastructure.Persistence;
 
 public static class ConfigurePersistenceServices
 {
-    public static void AddPersistenceServices(this IServiceCollection services)
+    public static void AddPersistenceServices(this IServiceCollection services, IConfiguration configuration)
     {
-        var connectionString = "Server=localhost;Port=5432;Database=product-db;User Id=postgres;Password=4321";
-
-        var dataSourceBuilder = new NpgsqlDataSourceBuilder(connectionString);
+        var dataSourceBuilder = new NpgsqlDataSourceBuilder(configuration.GetConnectionString("DefaultConnection"));
         dataSourceBuilder.EnableDynamicJson();
         var dataSource = dataSourceBuilder.Build();
 

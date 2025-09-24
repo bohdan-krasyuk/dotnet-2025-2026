@@ -1,8 +1,6 @@
 using Api.Dtos;
-using Application.Common.Interfaces;
 using Application.Common.Interfaces.Queries;
 using Application.Products.Commands;
-using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
