@@ -2,14 +2,14 @@ namespace Domain.Products;
 
 public class Product
 {
-    public Guid Id { get; }
+    public ProductId Id { get; }
     public string Title { get; private set; }
     public string Description { get; private set; }
 
     public DateTime CreatedAt { get; }
     public DateTime? UpdatedAt { get; private set; }
 
-    private Product(Guid id, string title, string description, DateTime createdAt, DateTime? updatedAt)
+    private Product(ProductId id, string title, string description, DateTime createdAt, DateTime? updatedAt)
     {
         Id = id;
         Title = title;
@@ -19,7 +19,7 @@ public class Product
     }
 
     public static Product New(
-        Guid id,
+        ProductId id,
         string title,
         string description)
     {
