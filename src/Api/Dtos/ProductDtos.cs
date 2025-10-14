@@ -8,6 +8,6 @@ public record ProductDto(Guid Id, string Title, string Description, DateTime Cre
         => new(product.Id.Value, product.Title, product.Description, product.CreatedAt, product.UpdatedAt);
 }
 
-public record CreateProductDto(string Title, string Description);
+public record CreateProductDto(string Title, string Description, IReadOnlyList<Guid> Categories);
 
 public record UpdateProductDto(Guid Id, string Title, string Description);

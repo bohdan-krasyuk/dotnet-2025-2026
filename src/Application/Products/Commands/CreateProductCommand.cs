@@ -1,5 +1,6 @@
 using Application.Common.Interfaces.Repositories;
 using Application.Products.Exceptions;
+using Domain.Categories;
 using Domain.Products;
 using LanguageExt;
 using MediatR;
@@ -10,6 +11,7 @@ public record CreateProductCommand : IRequest<Either<ProductException, Product>>
 {
     public required string Title { get; init; }
     public required string Description { get; init; }
+    public required IReadOnlyList<Guid> Categories { get; init; }
 }
 
 public class CreateProductCommandHandler(
@@ -32,8 +34,14 @@ public class CreateProductCommandHandler(
     {
         try
         {
+            var productId = ProductId.New();
+
+            var categories = request.Categories
+                .Select(x => CategoryProduct.New(new CategoryId(x), productId))
+                .ToArray();
+
             var product = await productRepository.AddAsync(
-                Product.New(ProductId.New(), request.Title, request.Description),
+                Product.New(productId, request.Title, request.Description, categories),
                 cancellationToken);
 
             return product;

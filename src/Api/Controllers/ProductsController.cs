@@ -29,7 +29,8 @@ public class ProductsController(
         var input = new CreateProductCommand
         {
             Title = request.Title,
-            Description = request.Description
+            Description = request.Description,
+            Categories = request.Categories
         };
 
         var newProduct = await sender.Send(input, cancellationToken);
