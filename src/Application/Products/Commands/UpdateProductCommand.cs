@@ -1,3 +1,4 @@
+using Application.Common.Interfaces;
 using Application.Common.Interfaces.Repositories;
 using Application.Products.Exceptions;
 using Domain.Categories;
@@ -17,11 +18,38 @@ public record UpdateProductCommand : IRequest<Either<ProductException, Product>>
 }
 
 public class UpdateProductCommandHandler(
+    IApplicationDbContext applicationDbContext,
     IProductRepository productRepository,
     ICategoryRepository categoryRepository,
     ICategoryProductRepository categoryProductRepository) : IRequestHandler<UpdateProductCommand, Either<ProductException, Product>>
 {
     public async Task<Either<ProductException, Product>> Handle(
+        UpdateProductCommand request,
+        CancellationToken cancellationToken)
+    {
+        using var transaction = await applicationDbContext.BeginTransactionAsync(cancellationToken);
+        try
+        {
+            var result = await HandleAsync(request, cancellationToken);
+            if (result.IsLeft)
+            {
+                transaction.Rollback();
+            }
+            else
+            {
+                transaction.Commit();
+            }
+
+            return result;
+        }
+        catch (Exception exception)
+        {
+            transaction.Rollback();
+            return new UnhandledProductException(ProductId.Empty(), exception);
+        }
+    }
+
+    private async Task<Either<ProductException, Product>> HandleAsync(
         UpdateProductCommand request,
         CancellationToken cancellationToken)
     {
