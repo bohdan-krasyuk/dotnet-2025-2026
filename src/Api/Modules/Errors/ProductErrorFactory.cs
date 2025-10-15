@@ -13,7 +13,7 @@ public static class ProductErrorFactory
             {
                 ProductAlreadyExistException => StatusCodes.Status409Conflict,
                 UnhandledProductException => StatusCodes.Status500InternalServerError,
-                ProductNotFoundException => StatusCodes.Status404NotFound,
+                ProductNotFoundException or ProductCategoriesNotFoundException => StatusCodes.Status404NotFound,
                 _ => throw new NotImplementedException("Product error handler does not implemented")
             }
         };

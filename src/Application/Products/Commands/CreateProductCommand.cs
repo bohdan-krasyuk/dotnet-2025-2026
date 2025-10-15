@@ -4,6 +4,7 @@ using Domain.Categories;
 using Domain.Products;
 using LanguageExt;
 using MediatR;
+using Unit = LanguageExt.Unit;
 
 namespace Application.Products.Commands;
 
@@ -15,7 +16,8 @@ public record CreateProductCommand : IRequest<Either<ProductException, Product>>
 }
 
 public class CreateProductCommandHandler(
-    IProductRepository productRepository) : IRequestHandler<CreateProductCommand, Either<ProductException, Product>>
+    IProductRepository productRepository,
+    ICategoryRepository categoryRepository) : IRequestHandler<CreateProductCommand, Either<ProductException, Product>>
 {
     public async Task<Either<ProductException, Product>> Handle(
         CreateProductCommand request,
@@ -25,7 +27,23 @@ public class CreateProductCommandHandler(
 
         return await existingProduct.MatchAsync(
             p => new ProductAlreadyExistException(p.Id),
-            () => CreateEntity(request, cancellationToken));
+            () => CheckCategories(request.Categories, cancellationToken)
+                .BindAsync(_ => CreateEntity(request, cancellationToken)));
+    }
+
+    private async Task<Either<ProductException, Unit>> CheckCategories(
+        IReadOnlyList<Guid> categories,
+        CancellationToken cancellationToken)
+    {
+        var entities = await categoryRepository.GetByIdsAsync(
+            categories.Select(x => new CategoryId(x)).ToList(),
+            cancellationToken);
+
+        var missingCategories = categories.Where(x => entities.All(y => y.Id.Value != x)).ToList();
+
+        return missingCategories.Any()
+            ? new ProductCategoriesNotFoundException(ProductId.Empty(), missingCategories)
+            : Unit.Default;
     }
 
     private async Task<Either<ProductException, Product>> CreateEntity(

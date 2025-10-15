@@ -62,6 +62,10 @@ public class ProductRepository : IProductRepository, IProductQueries
 
     public async Task<IReadOnlyList<Product>> GetAllAsync(CancellationToken cancellationToken)
     {
-        return await _context.Products.AsNoTracking().ToListAsync(cancellationToken);
+        return await _context.Products
+            .Include(x => x.Categories)!
+            .ThenInclude(x => x.Category)
+            .AsNoTracking()
+            .ToListAsync(cancellationToken);
     }
 }

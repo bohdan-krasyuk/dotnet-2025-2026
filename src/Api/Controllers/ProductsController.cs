@@ -49,7 +49,8 @@ public class ProductsController(
         {
             ProductId = request.Id,
             Title = request.Title,
-            Description = request.Description
+            Description = request.Description,
+            Categories = request.Categories
         };
 
         var updatedProduct = await sender.Send(input, cancellationToken);

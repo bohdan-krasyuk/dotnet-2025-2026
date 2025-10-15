@@ -23,4 +23,14 @@ public class CategoryRepository(ApplicationDbContext context) : ICategoryReposit
 
         return entity ?? Option<Category>.None;
     }
+
+    public async Task<IReadOnlyList<Category>> GetByIdsAsync(
+        IReadOnlyList<CategoryId> categoryIds,
+        CancellationToken cancellationToken)
+    {
+        return await context.Categories
+            .AsNoTracking()
+            .Where(x => categoryIds.Any(y => y == x.Id))
+            .ToListAsync(cancellationToken);
+    }
 }
