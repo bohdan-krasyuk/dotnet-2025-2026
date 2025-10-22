@@ -1,3 +1,4 @@
+using Application.Common.Interfaces.Queries;
 using Application.Common.Interfaces.Repositories;
 using Domain.Categories;
 using LanguageExt;
@@ -5,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Persistence.Repositories;
 
-public class CategoryRepository(ApplicationDbContext context) : ICategoryRepository
+public class CategoryRepository(ApplicationDbContext context) : ICategoryRepository, ICategoryQueries
 {
     public async Task<Category> AddAsync(Category category, CancellationToken cancellationToken)
     {
@@ -32,5 +33,14 @@ public class CategoryRepository(ApplicationDbContext context) : ICategoryReposit
             .AsNoTracking()
             .Where(x => categoryIds.Any(y => y == x.Id))
             .ToListAsync(cancellationToken);
+    }
+
+    public async Task<Option<Category>> GetByIdAsync(CategoryId id, CancellationToken cancellationToken)
+    {
+        var entity = await context.Categories
+            .AsNoTracking()
+            .FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
+
+        return entity ?? Option<Category>.None;
     }
 }

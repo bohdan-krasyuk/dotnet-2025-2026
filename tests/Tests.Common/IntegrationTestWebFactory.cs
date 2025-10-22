@@ -1,3 +1,5 @@
+using Application.Common.Interfaces;
+using Infrastructure.Emails;
 using Infrastructure.Persistence;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
@@ -8,6 +10,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Npgsql;
 using Testcontainers.PostgreSql;
+using Tests.Common.Services;
 using Xunit;
 
 namespace Tests.Common;
@@ -26,12 +29,19 @@ public class IntegrationTestWebFactory : WebApplicationFactory<Program>, IAsyncL
         builder.ConfigureTestServices(services =>
         {
             RegisterDatabase(services);
+            RegisterTestServices(services);
         }).ConfigureAppConfiguration((_, config) =>
         {
             config
                 .AddJsonFile("appsettings.Test.json")
                 .AddEnvironmentVariables();
         });
+    }
+
+    private void RegisterTestServices(IServiceCollection services)
+    {
+        services.RemoveServiceByType(typeof(EmailSendingService));
+        services.AddScoped<IEmailSendingService, InMemoryEmailSendingService>();
     }
 
     private void RegisterDatabase(IServiceCollection services)

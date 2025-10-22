@@ -1,3 +1,4 @@
+using Application.Common.Interfaces;
 using Application.Common.Interfaces.Repositories;
 using Application.Products.Exceptions;
 using Domain.Categories;
@@ -17,7 +18,8 @@ public record CreateProductCommand : IRequest<Either<ProductException, Product>>
 
 public class CreateProductCommandHandler(
     IProductRepository productRepository,
-    ICategoryRepository categoryRepository) : IRequestHandler<CreateProductCommand, Either<ProductException, Product>>
+    ICategoryRepository categoryRepository,
+    IEmailSendingService emailSendingService) : IRequestHandler<CreateProductCommand, Either<ProductException, Product>>
 {
     public async Task<Either<ProductException, Product>> Handle(
         CreateProductCommand request,
@@ -28,7 +30,8 @@ public class CreateProductCommandHandler(
         return await existingProduct.MatchAsync(
             p => new ProductAlreadyExistException(p.Id),
             () => CheckCategories(request.Categories, cancellationToken)
-                .BindAsync(_ => CreateEntity(request, cancellationToken)));
+                .BindAsync(_ => CreateEntity(request, cancellationToken)
+                    .BindAsync(newProduct => SendNotification(newProduct, cancellationToken))));
     }
 
     private async Task<Either<ProductException, Unit>> CheckCategories(
@@ -61,6 +64,24 @@ public class CreateProductCommandHandler(
             var product = await productRepository.AddAsync(
                 Product.New(productId, request.Title, request.Description, categories),
                 cancellationToken);
+
+            return product;
+        }
+        catch (Exception exception)
+        {
+            return new UnhandledProductException(ProductId.Empty(), exception);
+        }
+    }
+
+    private async Task<Either<ProductException, Product>> SendNotification(
+        Product product,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            await emailSendingService.SendEmailAsync(
+                "manager.manager@manager.com",
+                $"New product added to the system: {product.Title}, under id {product.Id}");
 
             return product;
         }

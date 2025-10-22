@@ -5,21 +5,45 @@ using Domain.Categories;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using Tests.Common;
+using Tests.Data.Categories;
 using Xunit;
 
 namespace Api.Tests.Integration.Categories;
 
-public class CategoriesControllerTests(IntegrationTestWebFactory factory)
-    : BaseIntegrationTest(factory), IAsyncLifetime
+public class CategoriesControllerTests : BaseIntegrationTest, IAsyncLifetime
 {
+    private readonly Category _firstTestCategory = CategoriesData.FirstTestCategory();
+    private readonly Category _secondTestCategory = CategoriesData.SecondTestCategory();
+
+    private const string BaseRoute = "categories";
+    private readonly string _getRoute;
+
+    public CategoriesControllerTests(IntegrationTestWebFactory factory) : base(factory)
+    {
+        _getRoute = $"{BaseRoute}/{_firstTestCategory.Id}";
+    }
+
+    [Fact]
+    public async Task ShouldGetCategoryById()
+    {
+        // Act
+        var response = await Client.GetAsync(_getRoute);
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        var categoryDto = await response.ToResponseModel<CategoryDto>();
+        categoryDto.Id.Should().Be(_firstTestCategory.Id.Value);
+        categoryDto.Name.Should().Be(_firstTestCategory.Name);
+    }
+
     [Fact]
     public async Task ShouldCreateCategory()
     {
         // Arrange
-        var request = new CreateCategoryDto("Test Category 1");
+        var request = new CreateCategoryDto(_secondTestCategory.Name);
 
         // Act
-        var response = await Client.PostAsJsonAsync("categories", request);
+        var response = await Client.PostAsJsonAsync(BaseRoute, request);
 
         // Assert
         response.IsSuccessStatusCode.Should().BeTrue();
@@ -28,17 +52,17 @@ public class CategoriesControllerTests(IntegrationTestWebFactory factory)
         var categoryId = new CategoryId(categoryDto.Id);
 
         var dbCategory = await Context.Categories.FirstAsync(x => x.Id.Equals(categoryId));
-        dbCategory.Name.Should().Be(request.Name);
+        dbCategory.Name.Should().Be(_secondTestCategory.Name);
     }
 
     [Fact]
     public async Task ShouldNotCreateCategoryBecauseNameDuplication()
     {
         // Arrange
-        var request = new CreateCategoryDto("First test category");
+        var request = new CreateCategoryDto(_firstTestCategory.Name);
 
         // Act
-        var response = await Client.PostAsJsonAsync("categories", request);
+        var response = await Client.PostAsJsonAsync(BaseRoute, request);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.Conflict);
@@ -46,16 +70,14 @@ public class CategoriesControllerTests(IntegrationTestWebFactory factory)
 
     public async Task InitializeAsync()
     {
-        var category = Category.New(CategoryId.New(), "First test category");
-        await Context.Categories.AddAsync(category);
-        await Context.SaveChangesAsync();
-        Context.ChangeTracker.Clear();
+        await Context.Categories.AddAsync(_firstTestCategory);
+        await SaveChangesAsync();
     }
 
     public async Task DisposeAsync()
     {
         Context.Categories.RemoveRange(Context.Categories);
 
-        await Context.SaveChangesAsync();
+        await SaveChangesAsync();
     }
 }

@@ -24,4 +24,10 @@ public abstract class BaseIntegrationTest : IClassFixture<IntegrationTestWebFact
 
         Client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(scheme: "TestScheme");
     }
+
+    protected async Task SaveChangesAsync()
+    {
+        await Context.SaveChangesAsync();
+        Context.ChangeTracker.Clear();
+    }
 }
