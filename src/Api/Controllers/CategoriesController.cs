@@ -2,8 +2,6 @@ using Api.Dtos;
 using Api.Modules.Errors;
 using Api.Services.Abstract;
 using Application.Categories.Commands;
-using Application.Common.Interfaces.Queries;
-using Domain.Categories;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 

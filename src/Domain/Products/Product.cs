@@ -11,6 +11,8 @@ public class Product
     public DateTime CreatedAt { get; }
     public DateTime? UpdatedAt { get; private set; }
 
+    public ICollection<ProductImage>? Images { get; private set; } = [];
+
     public ICollection<CategoryProduct>? Categories { get; private set; } = [];
 
     private Product(ProductId id, string title, string description, DateTime createdAt, DateTime? updatedAt)

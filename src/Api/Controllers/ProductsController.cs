@@ -76,4 +76,24 @@ public class ProductsController(
             p => ProductDto.FromDomainModel(p),
             e => e.ToObjectResult());
     }
+
+    [HttpPost("{productId:guid}/images")]
+    public async Task<ActionResult<ProductDto>> UploadImage(
+        [FromRoute] Guid productId,
+        [FromForm] IFormFile file,
+        CancellationToken cancellationToken)
+    {
+        var input = new UploadProductImageCommand
+        {
+            ProductId = productId,
+            OriginalName = file.FileName,
+            FileStream = file.OpenReadStream()
+        };
+
+        var result = await sender.Send(input, cancellationToken);
+
+        return result.Match<ActionResult<ProductDto>>(
+            p => ProductDto.FromDomainModel(p),
+            e => e.ToObjectResult());
+    }
 }

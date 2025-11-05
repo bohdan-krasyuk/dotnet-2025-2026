@@ -14,6 +14,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<Product> Products { get; init; }
     public DbSet<Category> Categories { get; init; }
     public DbSet<CategoryProduct> CategoryProducts { get; init; }
+    public DbSet<ProductImage> ProductImages { get; init; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

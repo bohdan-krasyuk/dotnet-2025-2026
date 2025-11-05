@@ -42,5 +42,8 @@ public static class ConfigurePersistenceServices
 
         services.AddScoped<CategoryProductRepository>();
         services.AddScoped<ICategoryProductRepository>(provider => provider.GetRequiredService<CategoryProductRepository>());
+
+        services.AddScoped<ProductImageRepository>();
+        services.AddScoped<IProductImageRepository>(provider => provider.GetRequiredService<ProductImageRepository>());
     }
 }
