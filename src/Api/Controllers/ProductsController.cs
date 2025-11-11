@@ -30,7 +30,8 @@ public class ProductsController(
         {
             Title = request.Title,
             Description = request.Description,
-            Categories = request.Categories
+            Categories = request.Categories,
+            Features = ProductFeaturesDto.ToDomainModel(request.Features)
         };
 
         var newProduct = await sender.Send(input, cancellationToken);
@@ -50,7 +51,8 @@ public class ProductsController(
             ProductId = request.Id,
             Title = request.Title,
             Description = request.Description,
-            Categories = request.Categories
+            Categories = request.Categories,
+            Features = ProductFeaturesDto.ToDomainModel(request.Features)
         };
 
         var updatedProduct = await sender.Send(input, cancellationToken);

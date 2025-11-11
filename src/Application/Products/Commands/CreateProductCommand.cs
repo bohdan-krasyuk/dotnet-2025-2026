@@ -14,6 +14,7 @@ public record CreateProductCommand : IRequest<Either<ProductException, Product>>
     public required string Title { get; init; }
     public required string Description { get; init; }
     public required IReadOnlyList<Guid> Categories { get; init; }
+    public required ProductFeatures Features { get; init; }
 }
 
 public class CreateProductCommandHandler(
@@ -62,7 +63,7 @@ public class CreateProductCommandHandler(
                 .ToArray();
 
             var product = await productRepository.AddAsync(
-                Product.New(productId, request.Title, request.Description, categories),
+                Product.New(productId, request.Title, request.Description, categories, request.Features),
                 cancellationToken);
 
             return product;

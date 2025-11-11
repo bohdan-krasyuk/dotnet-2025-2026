@@ -28,5 +28,22 @@ public class ProductsConfiguration : IEntityTypeConfiguration<Product>
         builder.Property(x => x.UpdatedAt)
             .HasConversion(new DateTimeUtcConverter())
             .IsRequired(false);
+
+        builder.OwnsOne<ProductFeatures>(x => x.Features, featuresBuilder =>
+        {
+            featuresBuilder.ToJson("features");
+
+            featuresBuilder.Property(x => x.Weight).HasColumnName("weight");
+            featuresBuilder.Property(x => x.Height).HasColumnName("height");
+            featuresBuilder.Property(x => x.Width).HasColumnName("width");
+            featuresBuilder.Property(x => x.Ram).HasColumnName("ram");
+            featuresBuilder.Property(x => x.Storage).HasColumnName("storage");
+            featuresBuilder.Property(x => x.ScreenSize).HasColumnName("screen_size");
+
+            // featuresBuilder.OwnsOne<NestedFeature>(nf => nf.NestedFeature, nestedFeatureBuilder =>
+            // {
+            //     featuresBuilder.ToJson("nested_feature"); // Will throw an error
+            // });
+        });
     }
 }

@@ -15,6 +15,7 @@ public record UpdateProductCommand : IRequest<Either<ProductException, Product>>
     public required string Title { get; init; }
     public required string Description { get; init; }
     public required IReadOnlyList<Guid> Categories { get; init; }
+    public required ProductFeatures Features { get; init; }
 }
 
 public class UpdateProductCommandHandler(
@@ -117,7 +118,7 @@ public class UpdateProductCommandHandler(
     {
         try
         {
-            product.UpdateDetails(request.Title, request.Description);
+            product.UpdateDetails(request.Title, request.Description, request.Features);
 
             return await productRepository.UpdateAsync(product, cancellationToken);
         }

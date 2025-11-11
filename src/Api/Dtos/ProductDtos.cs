@@ -22,6 +22,26 @@ public record ProductDto(
                 : []);
 }
 
-public record CreateProductDto(string Title, string Description, IReadOnlyList<Guid> Categories);
+public record ProductFeaturesDto(
+    double? Weight,
+    double? Height,
+    double? Width,
+    double? Ram,
+    double? Storage,
+    double? ScreenSize)
+{
+    public static ProductFeatures ToDomainModel(ProductFeaturesDto? dto)
+        => dto == null
+            ? ProductFeatures.Empty()
+            : ProductFeatures.New(
+                dto.Weight,
+                dto.Height,
+                dto.Width,
+                dto.Ram,
+                dto.Storage,
+                dto.ScreenSize);
+}
 
-public record UpdateProductDto(Guid Id, string Title, string Description, IReadOnlyList<Guid> Categories);
+public record CreateProductDto(string Title, string Description, IReadOnlyList<Guid> Categories, ProductFeaturesDto? Features);
+
+public record UpdateProductDto(Guid Id, string Title, string Description, IReadOnlyList<Guid> Categories, ProductFeaturesDto? Features);

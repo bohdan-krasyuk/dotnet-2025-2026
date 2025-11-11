@@ -23,7 +23,11 @@ public static class ConfigurePersistenceServices
                 dataSource,
                 builder => builder.MigrationsAssembly(typeof(ApplicationDbContext).Assembly.FullName))
             .UseSnakeCaseNamingConvention()
-            .ConfigureWarnings(w => w.Ignore(CoreEventId.ManyServiceProvidersCreatedWarning)));
+            .ConfigureWarnings(w =>
+            {
+                w.Ignore(CoreEventId.ManyServiceProvidersCreatedWarning);
+                w.Ignore(RelationalEventId.PendingModelChangesWarning);
+            }));
 
         services.AddScoped<ApplicationDbContextInitialiser>();
         services.AddScoped<IApplicationDbContext>(provider => provider.GetRequiredService<ApplicationDbContext>());

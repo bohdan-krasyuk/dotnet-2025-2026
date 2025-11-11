@@ -11,6 +11,8 @@ public class Product
     public DateTime CreatedAt { get; }
     public DateTime? UpdatedAt { get; private set; }
 
+    public ProductFeatures? Features { get; private set; } = ProductFeatures.Empty();
+
     public ICollection<ProductImage>? Images { get; private set; } = [];
 
     public ICollection<CategoryProduct>? Categories { get; private set; } = [];
@@ -28,16 +30,19 @@ public class Product
         ProductId id,
         string title,
         string description,
-        ICollection<CategoryProduct> categories)
+        ICollection<CategoryProduct> categories,
+        ProductFeatures? features)
         => new(id, title, description, DateTime.UtcNow, null)
         {
-            Categories = categories
+            Categories = categories,
+            Features = features
         };
 
-    public void UpdateDetails(string title, string description)
+    public void UpdateDetails(string title, string description, ProductFeatures features)
     {
         Title = title;
         Description = description;
+        Features = features;
 
         UpdatedAt = DateTime.UtcNow;
     }

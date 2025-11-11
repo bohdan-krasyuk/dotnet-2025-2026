@@ -36,7 +36,14 @@ public class ProductsControllerTests : BaseIntegrationTest, IAsyncLifetime
         var request = new CreateProductDto(
             Title: _secondTestProduct.Title,
             Description: _secondTestProduct.Description,
-            Categories: [_firstTestCategory.Id.Value]);
+            Categories: [_firstTestCategory.Id.Value],
+            Features: new ProductFeaturesDto(
+                Weight: 50,
+                Height: 100,
+                Width: 200,
+                Ram: null,
+                Storage: null,
+                ScreenSize: null));
 
         // Act
         var response = await Client.PostAsJsonAsync(BaseRoute, request);
@@ -53,7 +60,8 @@ public class ProductsControllerTests : BaseIntegrationTest, IAsyncLifetime
             Id: _firstTestProduct.Id.Value,
             Title: _secondTestProduct.Title,
             Description: _secondTestProduct.Description,
-            Categories: [Guid.NewGuid()]);
+            Categories: [Guid.NewGuid()],
+            Features: null);
 
         // Act
         var response = await Client.PutAsJsonAsync(BaseRoute, request);
@@ -70,7 +78,14 @@ public class ProductsControllerTests : BaseIntegrationTest, IAsyncLifetime
             Id: _firstTestProduct.Id.Value,
             Title: _secondTestProduct.Title,
             Description: _secondTestProduct.Description,
-            Categories: [_secondTestCategory.Id.Value]);
+            Categories: [_secondTestCategory.Id.Value],
+            Features: new ProductFeaturesDto(
+                Weight: 50,
+                Height: 100,
+                Width: 200,
+                Ram: null,
+                Storage: null,
+                ScreenSize: null));
 
         // Act
         var response = await Client.PutAsJsonAsync(BaseRoute, request);
